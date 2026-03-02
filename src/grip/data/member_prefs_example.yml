@@ -14,20 +14,23 @@
 
 members:
 
-  # ── Trevor──────────────────────────────────────────────────────────
-  - name: Trevor
-    role: PhD student
+  # ── Member 1 ────────────────────────────────────────────────────────────────
+  - name: First Last
+    role: PI
     research_areas: |
-      My personal interest is in applications of artificial intelligence to medical imaging, with particular focuses in image reconstruction, analysis and automated diagnosis, image simulation, automated/guided image acquisition, and neural representations. I use approaches in generative modeling, including diffusion and flow models, and neural representations, including NeRFs. Applications in cardiac imaging and ultrasound are most relevant to my research, although I'm interested broadly in other imaging modalities and sensor systems.
+      AI for medical imaging: image reconstruction, automated diagnosis,
+      image simulation, and neural representations.
+      Primary approaches: generative modeling (diffusion models, flow matching), NeRFs.
+      Most relevant modalities: cardiac imaging and ultrasound.
     example_papers:
       - "Score-Based Generative Modeling through Stochastic Differential Equations"
       - "Flow Matching for Generative Modeling"
-      - "DINOv3"
       - "PanEcho: Complete AI-enabled echocardiography interpretation with multi-task deep learning"
-      - "Old Optimizer, New Norm: An Anthology"
     adjacent_areas: |
-      Other topics that are outside my immediate research area but which I'm interested include robotics and medical robotics, language and multimodality models, protein folding generative models, and ML theory for generative models.
+      Robotics and medical robotics, multimodal language models,
+      protein structure prediction, ML theory for generative models.
     exclusions: |
+      Pure NLP without medical or imaging relevance.
     notes: |
 
   # ── Member 2 ────────────────────────────────────────────────────────────────
