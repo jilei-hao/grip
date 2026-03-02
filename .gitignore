@@ -93,3 +93,4 @@ src/grip/data/member_prefs_*.yml
 # Live interest profile (auto-generated/edited — keep only the example template)
 src/grip/data/interest_profile.txt
 interest_profile.txt
+profile_versions/

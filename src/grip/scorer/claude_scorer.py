@@ -43,7 +43,14 @@ class ClaudeScorer:
             ],
         )
 
-        result = json.loads(response.content[0].text)
+        raw = response.content[0].text.strip()
+        # Strip markdown code fences if the model wrapped the JSON
+        if raw.startswith("```"):
+            raw = raw.split("```", 2)[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+            raw = raw.strip()
+        result = json.loads(raw)
         selected = result.get("selected", [])
         notes = result.get("selection_notes", "")
         print(f"[scorer] Selected {len(selected)} papers. Notes: {notes}")
