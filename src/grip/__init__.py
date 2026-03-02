@@ -6,7 +6,7 @@ learning from your group's 👍/👎 feedback.
 
 Quickstart:
     pip install grip-digest
-    cp $(python -c "import grip; print(grip.DEFAULT_PROFILE_PATH)") ./interest_profile.txt
+    grip init          # copies interest_profile.example.txt → ./interest_profile.txt
     grip --dry-run
 """
 
@@ -19,4 +19,4 @@ except PackageNotFoundError:
 
 # Expose the default data path so users can bootstrap their profile
 from pathlib import Path
-DEFAULT_PROFILE_PATH = Path(__file__).parent / "data" / "interest_profile.txt"
+DEFAULT_PROFILE_PATH = Path(__file__).parent / "data" / "interest_profile.example.txt"

@@ -17,6 +17,7 @@ authors = [
 dependencies = [
     "anthropic>=0.20.0",
     "python-dotenv>=1.0.0",
+    "pyyaml>=6.0",
 ]
 
 [project.optional-dependencies]
@@ -43,6 +44,7 @@ dev = [
 # After `pip install`, these CLI commands become available:
 grip = "grip.cli:main"
 grip-update-profile = "grip.cli:update_profile"
+grip-synthesize-profile = "grip.cli:synthesize_profile_entry"
 
 [project.urls]
 Repository = "https://github.com/your-org/grip"
@@ -53,7 +55,8 @@ packages = ["src/grip"]
 
 # Include the default data files (profile template, gitkeeps) in the package
 [tool.hatch.build.targets.wheel.force-include]
-"src/grip/data/interest_profile.txt" = "grip/data/interest_profile.txt"
+"src/grip/data/interest_profile.example.txt" = "grip/data/interest_profile.example.txt"
+"src/grip/data/member_prefs_example.yml" = "grip/data/member_prefs_example.yml"
 
 # ── Ruff linter ───────────────────────────────────────────────────────────────
 [tool.ruff]

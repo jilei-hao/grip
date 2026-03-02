@@ -35,6 +35,26 @@ Respond ONLY in valid JSON with this structure:
 }}
 """
 
+PROFILE_SYNTHESIS_PROMPT = """You are building a research interest profile for an academic lab digest tool.
+Below are preference responses from each lab member. Synthesize them into a single, unified
+group interest profile that will be used to score and filter research papers daily.
+
+MEMBER RESPONSES:
+{member_responses}
+
+TASK:
+Write a concise group interest profile (strictly under 300 words) covering:
+1. Core research themes shared or complementary across members
+2. Specific methods, models, or techniques of interest
+3. Application domains and modalities
+4. Explicit exclusions (topics to filter out)
+5. A short "Example Papers" list drawn from the members' favorites
+
+Style: direct and specific — written as instructions to a paper-scoring agent, not as a bio.
+Preserve any explicit exclusions. Avoid generic phrases like "cutting-edge" or "state-of-the-art".
+Return ONLY the profile text with no preamble.
+"""
+
 PROFILE_UPDATE_PROMPT = """You are maintaining a research interest profile for an academic group.
 Below is the current profile, followed by recent feedback on paper selections.
 

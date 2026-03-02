@@ -7,6 +7,7 @@ Registered as console_scripts in pyproject.toml, so after `pip install`:
     grip --dry-run          # fetch + score, print results, skip Slack
     grip --update-profile   # run weekly profile update from feedback
     grip init               # copy starter profile to current directory
+    grip synthesize-profile # build interest_profile.txt from member_prefs_*.yml
     grip version            # print version
 
 """
@@ -27,7 +28,7 @@ def main() -> None:
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Fetch and score papers, print results, but don't post to Slack.",
+        help="Fetch and score papers without posting to Slack; or preview synthesize-profile without saving.",
     )
     parser.add_argument(
         "--update-profile",
@@ -37,8 +38,12 @@ def main() -> None:
     parser.add_argument(
         "command",
         nargs="?",
-        choices=["init", "version"],
-        help="init: copy starter profile to ./interest_profile.txt | version: print version",
+        choices=["init", "version", "synthesize-profile"],
+        help=(
+            "init: copy starter profile to ./interest_profile.txt | "
+            "version: print version | "
+            "synthesize-profile: build interest_profile.txt from member_prefs_*.yml"
+        ),
     )
     args = parser.parse_args()
 
@@ -57,6 +62,11 @@ def main() -> None:
     if args.command == "init":
         _init_profile()
         return
+
+    if args.command == "synthesize-profile":
+        from grip.profile.synthesizer import synthesize_profile
+        ok = synthesize_profile(dry_run=args.dry_run)
+        sys.exit(0 if ok else 1)
 
     if args.update_profile:
         from grip.pipeline import run_profile_update
@@ -78,6 +88,22 @@ def update_profile() -> None:
     from grip.pipeline import run_profile_update
     updated = run_profile_update()
     sys.exit(0 if updated else 1)
+
+
+def synthesize_profile_entry() -> None:
+    """Secondary entry point: grip-synthesize-profile"""
+    import argparse as _ap
+    p = _ap.ArgumentParser(prog="grip-synthesize-profile")
+    p.add_argument("--dry-run", action="store_true", help="Print result without saving.")
+    args = p.parse_args()
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
+    from grip.profile.synthesizer import synthesize_profile
+    ok = synthesize_profile(dry_run=args.dry_run)
+    sys.exit(0 if ok else 1)
 
 
 def _init_profile() -> None:

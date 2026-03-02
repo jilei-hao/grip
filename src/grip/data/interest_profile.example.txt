@@ -1,0 +1,25 @@
+# GRIP Group Interest Profile
+# This file is automatically updated based on feedback.
+# You can also edit it directly — changes take effect on the next run.
+# Last updated: [pending questionnaire responses]
+
+## Core Research Areas
+My personal interest is in applications of artificial intelligence to medical imaging, with particular focuses in image reconstruction, analysis and automated diagnosis, image simulation, automated/guided image acquisition, and neural representations. I use approaches in generative modeling, including diffusion and flow models, and neural representations, including NeRFs. Applications in cardiac imaging and ultrasound are most relevant to my research, although I'm interested broadly in other imaging modalities and sensor systems.
+
+## Adjacent Areas of Interest
+[TO BE FILLED]
+
+## Explicit Exclusions
+[TO BE FILLED — topics to filter out even if superficially related]
+
+## Example Papers We Love
+Score-Based Generative Modeling through Stochastic Differential Equations
+Flow Matching for Generative Modeling
+DINOv3
+PanEcho: Complete AI-enabled echocardiography interpretation with multi-task deep learning
+Old Optimizer, New Norm: An Anthology
+
+
+
+# Changelog
+# 20260302 - Jilei: Initial Update

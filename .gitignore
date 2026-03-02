@@ -85,3 +85,11 @@ dmypy.json
 *.env
 .env.*
 !.env.example
+
+# Member preference files (contain personal research details — keep only the example)
+src/grip/data/member_prefs_*.yml
+!src/grip/data/member_prefs_example.yml
+
+# Live interest profile (auto-generated/edited — keep only the example template)
+src/grip/data/interest_profile.txt
+interest_profile.txt

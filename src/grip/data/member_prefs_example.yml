@@ -1,0 +1,46 @@
+# GRIP Member Preference Responses
+# ─────────────────────────────────────────────────────────────────────────────
+# HOW TO USE:
+#   1. Copy this file to  member_prefs_YYYYMMDD.yml  (e.g. member_prefs_20260302.yml)
+#   2. Fill in / update your section. All fields are optional — paste freely.
+#   3. Run:  grip synthesize-profile
+#      This calls Claude to condense all responses into a fresh interest_profile.txt.
+#
+# TIPS:
+#   - Use the | block scalar for multi-line text (indent the content)
+#   - example_papers: is a list — add as many as you like
+#   - Leave fields blank or delete them if not applicable
+# ─────────────────────────────────────────────────────────────────────────────
+
+members:
+
+  # ── Trevor──────────────────────────────────────────────────────────
+  - name: Trevor
+    role: PhD student
+    research_areas: |
+      My personal interest is in applications of artificial intelligence to medical imaging, with particular focuses in image reconstruction, analysis and automated diagnosis, image simulation, automated/guided image acquisition, and neural representations. I use approaches in generative modeling, including diffusion and flow models, and neural representations, including NeRFs. Applications in cardiac imaging and ultrasound are most relevant to my research, although I'm interested broadly in other imaging modalities and sensor systems.
+    example_papers:
+      - "Score-Based Generative Modeling through Stochastic Differential Equations"
+      - "Flow Matching for Generative Modeling"
+      - "DINOv3"
+      - "PanEcho: Complete AI-enabled echocardiography interpretation with multi-task deep learning"
+      - "Old Optimizer, New Norm: An Anthology"
+    adjacent_areas: |
+      Other topics that are outside my immediate research area but which I'm interested include robotics and medical robotics, language and multimodality models, protein folding generative models, and ML theory for generative models.
+    exclusions: |
+    notes: |
+
+  # ── Member 2 ────────────────────────────────────────────────────────────────
+  # - name: First Last
+  #   role: PhD student
+  #   research_areas: |
+  #     Describe your research interests here. Copy-paste from your bio or proposal.
+  #   example_papers:
+  #     - "Paper title 1"
+  #     - "Paper title 2"
+  #   adjacent_areas: |
+  #     Nearby topics you want included even if not your core focus.
+  #   exclusions: |
+  #     Topics you want filtered out.
+  #   notes: |
+  #     Anything else the recommender should know.
