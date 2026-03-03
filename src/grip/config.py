@@ -70,6 +70,18 @@ class Settings:
             raise EnvironmentError("GRIP_SLACK_WEBHOOK environment variable is not set.")
         return url
 
+    @property
+    def slack_bot_token(self) -> str | None:
+        """Optional Slack bot token for threaded posting (xoxb-…).
+        When set alongside slack_channel_id, enables per-paper thread replies
+        so users can react to each paper individually."""
+        return os.environ.get("GRIP_SLACK_BOT_TOKEN") or None
+
+    @property
+    def slack_channel_id(self) -> str | None:
+        """Slack channel ID (e.g. C01234ABCDE) used with slack_bot_token."""
+        return os.environ.get("GRIP_SLACK_CHANNEL_ID") or None
+
 
 def load_settings() -> Settings:
     """Load settings from environment variables."""

@@ -13,9 +13,9 @@ GROUP INTEREST PROFILE:
 
 INSTRUCTIONS:
 - Select the top {top_n} most relevant papers
-- For each selected paper, write 2-3 sentence summary explaining:
-  (1) what the paper does, and (2) WHY it's relevant to this group specifically
-- Be specific about relevance — avoid generic praise
+- For each selected paper, write a single-sentence summary (≤280 characters) covering
+  what the paper does and why it matters to this group
+- Be specific — avoid generic praise
 - If fewer than {top_n} papers are genuinely relevant, select fewer
 - Rank by relevance (most relevant first)
 
