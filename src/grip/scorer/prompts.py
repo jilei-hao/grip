@@ -55,6 +55,34 @@ Preserve any explicit exclusions. Avoid generic phrases like "cutting-edge" or "
 Return ONLY the profile text with no preamble.
 """
 
+SEARCH_TERM_REFINEMENT_PROMPT = """You are optimizing keyword search terms for an academic paper digest tool.
+The tool queries arXiv, PubMed, bioRxiv, and medRxiv APIs using exact keyword matches against
+paper titles and abstracts.
+
+CURRENT SEARCH TERMS:
+{current_terms}
+
+LAB MEMBER PREFERENCES:
+{member_responses}
+
+TASK:
+Generate an optimized list of search terms that will best surface papers relevant to this group.
+
+RULES:
+- Produce 8–15 terms total
+- Each term should be a short phrase (1–4 words) that commonly appears in paper titles/abstracts
+- Prefer specific technical terms over broad ones (e.g., "diffusion model" over "generative AI")
+- Cover the core research areas AND adjacent areas from member preferences
+- Avoid redundancy — don't include both "neural network" and "deep learning" if they retrieve the same papers
+- Do NOT include exclusion topics
+
+Respond ONLY in valid JSON:
+{{
+  "search_terms": ["term1", "term2", ...],
+  "reasoning": "Brief explanation of key additions/removals vs. current terms"
+}}
+"""
+
 PROFILE_UPDATE_PROMPT = """You are maintaining a research interest profile for an academic group.
 Below is the current profile, followed by recent feedback on paper selections.
 

@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from grip.config import Settings, load_settings
 from grip.fetchers.arxiv import ArxivFetcher
+from grip.fetchers.medrxiv_biorxiv import BioRxivFetcher
+from grip.fetchers.pubmed import PubMedFetcher
 from grip.notifier.slack import SlackNotifier
 from grip.profile.manager import ProfileManager
 from grip.scorer.claude_scorer import ClaudeScorer
@@ -36,6 +38,27 @@ def run_digest(settings: Settings | None = None, dry_run: bool = False) -> list[
         search_terms=s.search_terms,
         max_results=s.max_fetch_per_source,
         days_lookback=s.days_lookback,
+    ).fetch_papers()
+
+    papers += BioRxivFetcher(
+        search_terms=s.search_terms,
+        server="biorxiv",
+        days_lookback=s.days_lookback,
+        max_results=s.max_fetch_per_source,
+    ).fetch_papers()
+
+    papers += BioRxivFetcher(
+        search_terms=s.search_terms,
+        server="medrxiv",
+        days_lookback=s.days_lookback,
+        max_results=s.max_fetch_per_source,
+    ).fetch_papers()
+
+    papers += PubMedFetcher(
+        search_terms=s.search_terms,
+        days_lookback=s.days_lookback,
+        max_results=s.max_fetch_per_source,
+        api_key=s.ncbi_api_key,
     ).fetch_papers()
 
     # Add more sources here as you implement them:

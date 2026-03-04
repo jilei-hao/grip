@@ -82,6 +82,13 @@ class Settings:
         """Slack channel ID (e.g. C01234ABCDE) used with slack_bot_token."""
         return os.environ.get("GRIP_SLACK_CHANNEL_ID") or None
 
+    @property
+    def ncbi_api_key(self) -> str | None:
+        """Optional NCBI API key. Raises the E-utilities rate limit from 3 to
+        10 requests/second. Get one free at https://www.ncbi.nlm.nih.gov/account/
+        Set NCBI_API_KEY in environment or .env file."""
+        return os.environ.get("NCBI_API_KEY") or None
+
 
 def load_settings() -> Settings:
     """Load settings from environment variables."""

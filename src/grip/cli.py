@@ -3,12 +3,13 @@ GRIP — CLI Entry Point
 
 Registered as console_scripts in pyproject.toml, so after `pip install`:
 
-    grip                    # run daily digest
-    grip --dry-run          # fetch + score, print results, skip Slack
-    grip --update-profile   # run weekly profile update from feedback
-    grip init               # copy starter profile to current directory
-    grip synthesize-profile # build interest_profile.txt from member_prefs_*.yml
-    grip version            # print version
+    grip                        # run daily digest
+    grip --dry-run              # fetch + score, print results, skip Slack
+    grip --update-profile       # synthesize profile from member_prefs, refine
+                                #   search terms, then apply feedback reactions
+    grip --update-profile --dry-run  # preview each step without saving
+    grip init                   # copy starter profile to current directory
+    grip version                # print version
 
 """
 
@@ -33,16 +34,18 @@ def main() -> None:
     parser.add_argument(
         "--update-profile",
         action="store_true",
-        help="Run weekly profile update from Slack feedback reactions.",
+        help=(
+            "Full profile update: synthesize interest_profile.txt from member_prefs_*.yml, "
+            "refine search terms, then apply feedback reactions."
+        ),
     )
     parser.add_argument(
         "command",
         nargs="?",
-        choices=["init", "version", "synthesize-profile"],
+        choices=["init", "version"],
         help=(
             "init: copy starter profile to ./interest_profile.txt | "
-            "version: print version | "
-            "synthesize-profile: build interest_profile.txt from member_prefs_*.yml"
+            "version: print version"
         ),
     )
     args = parser.parse_args()
@@ -63,15 +66,22 @@ def main() -> None:
         _init_profile()
         return
 
-    if args.command == "synthesize-profile":
-        from grip.profile.synthesizer import synthesize_profile
-        ok = synthesize_profile(dry_run=args.dry_run)
-        sys.exit(0 if ok else 1)
-
     if args.update_profile:
+        from grip.profile.synthesizer import synthesize_profile
+        from grip.profile.search_refiner import refine_search_terms
         from grip.pipeline import run_profile_update
-        updated = run_profile_update()
-        sys.exit(0 if updated else 1)
+
+        print("── Step 1/3: Synthesize profile from member_prefs ──")
+        synthesize_profile(dry_run=args.dry_run)
+
+        print("── Step 2/3: Refine search terms ──")
+        refine_search_terms(dry_run=args.dry_run)
+
+        print("── Step 3/3: Apply feedback reactions ──")
+        run_profile_update()
+
+        print("── Profile update complete ──")
+        return
 
     from grip.pipeline import run_digest
     selected = run_digest(dry_run=args.dry_run)
@@ -80,14 +90,29 @@ def main() -> None:
 
 def update_profile() -> None:
     """Secondary entry point: grip-update-profile"""
+    import argparse as _ap
+    p = _ap.ArgumentParser(prog="grip-update-profile")
+    p.add_argument("--dry-run", action="store_true", help="Preview each step without saving.")
+    args = p.parse_args()
     try:
         from dotenv import load_dotenv
         load_dotenv()
     except ImportError:
         pass
+    from grip.profile.synthesizer import synthesize_profile
+    from grip.profile.search_refiner import refine_search_terms
     from grip.pipeline import run_profile_update
-    updated = run_profile_update()
-    sys.exit(0 if updated else 1)
+
+    print("── Step 1/3: Synthesize profile from member_prefs ──")
+    synthesize_profile(dry_run=args.dry_run)
+
+    print("── Step 2/3: Refine search terms ──")
+    refine_search_terms(dry_run=args.dry_run)
+
+    print("── Step 3/3: Apply feedback reactions ──")
+    run_profile_update()
+
+    print("── Profile update complete ──")
 
 
 def synthesize_profile_entry() -> None:

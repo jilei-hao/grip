@@ -30,6 +30,15 @@ def _find_latest_prefs(data_dir: Path) -> Path | None:
     return candidates[0] if candidates else None
 
 
+def _to_str(value: object) -> str:
+    """Normalise a YAML field that may be a string, a list, or None."""
+    if value is None:
+        return ""
+    if isinstance(value, list):
+        return "\n".join(str(v) for v in value)
+    return str(value)
+
+
 def _format_member_responses(members: list[dict]) -> str:  # type: ignore[type-arg]
     """Render member YAML dicts into a readable text block for the prompt."""
     parts: list[str] = []
@@ -39,17 +48,17 @@ def _format_member_responses(members: list[dict]) -> str:  # type: ignore[type-a
         header = f"### {name}" + (f" ({role})" if role else "")
         lines = [header]
 
-        if research := m.get("research_areas", "").strip():
+        if research := _to_str(m.get("research_areas")).strip():
             lines.append(f"Research areas:\n{research}")
-        if adjacent := m.get("adjacent_areas", "").strip():
+        if adjacent := _to_str(m.get("adjacent_areas")).strip():
             lines.append(f"Adjacent areas of interest:\n{adjacent}")
         if papers := m.get("example_papers"):
             lines.append("Example papers they like:")
             for p in papers:
                 lines.append(f"  - {p}")
-        if excl := m.get("exclusions", "").strip():
+        if excl := _to_str(m.get("exclusions")).strip():
             lines.append(f"Exclusions:\n{excl}")
-        if notes := m.get("notes", "").strip():
+        if notes := _to_str(m.get("notes")).strip():
             lines.append(f"Notes:\n{notes}")
 
         parts.append("\n".join(lines))

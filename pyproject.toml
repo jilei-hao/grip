@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "grip-digest"
-version = "0.1.0"
+name = "grip"
+version = "1.0.0"
 description = "Group Research Intelligence Pipeline — daily paper digest for Slack"
 readme = "README.md"
 requires-python = ">=3.11"

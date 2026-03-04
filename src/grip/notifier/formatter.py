@@ -50,7 +50,8 @@ def format_digest_header(selected_papers: list[dict], date: str | None = None) -
                     "type": "mrkdwn",
                     "text": (
                         f"*{len(selected_papers)} paper{'s' if len(selected_papers) != 1 else ''}* matched your profile"
-                        " · Open the thread 🧵 to read summaries and react 👍 👎 on each paper"
+                        # TODO: re-enable feedback reminder when feedback collection is active
+                        # " · Open the thread 🧵 to read summaries and react 👍 👎 on each paper"
                     ),
                 }
             ],
@@ -74,6 +75,7 @@ def format_paper_block(paper: dict, index: int) -> list[dict]:
     summary = paper.get("summary", "").strip()
 
     blocks: list[dict] = [
+        {"type": "divider"},
         # Title + reason
         {
             "type": "section",
@@ -83,13 +85,15 @@ def format_paper_block(paper: dict, index: int) -> list[dict]:
                 + (f"\n_{reason}_" if reason else ""),
             },
         },
-        # Score + feedback prompt
+        # Score (feedback prompt temporarily disabled)
         {
             "type": "context",
             "elements": [
                 {
                     "type": "mrkdwn",
-                    "text": f"Relevance: *{score}/10* · React 👍 or 👎 to give feedback",
+                    # TODO: re-enable feedback reminder when feedback collection is active
+                    # "text": f"Relevance: *{score}/10* · React 👍 or 👎 to give feedback",
+                    "text": f"Relevance: *{score}/10*",
                 }
             ],
         },
@@ -106,6 +110,7 @@ def format_paper_block(paper: dict, index: int) -> list[dict]:
             },
         })
 
+    blocks.append({"type": "divider"})
     return blocks
 
 
@@ -143,14 +148,17 @@ def format_digest(selected_papers: list[dict], date: str | None = None) -> list[
             "elements": [
                 {
                     "type": "mrkdwn",
-                    "text": f"Score: *{score}/10* · React 👍 👎 to give feedback",
+                    # TODO: re-enable feedback reminder when feedback collection is active
+                    # "text": f"Score: *{score}/10* · React 👍 👎 to give feedback",
+                    "text": f"Score: *{score}/10*",
                 }
             ],
         })
         blocks.append({"type": "divider"})
 
-    blocks.append({
-        "type": "context",
-        "elements": [{"type": "mrkdwn", "text": "GRIP · Your reactions help improve future selections"}],
-    })
+    # TODO: re-enable feedback footer when feedback collection is active
+    # blocks.append({
+    #     "type": "context",
+    #     "elements": [{"type": "mrkdwn", "text": "GRIP · Your reactions help improve future selections"}],
+    # })
     return blocks
