@@ -123,9 +123,9 @@ def refine_search_terms(settings: Settings | None = None, dry_run: bool = False)
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _find_env_file() -> Path | None:
-    """Search for a .env file: cwd first, then up to three parent levels."""
+    """Search for a .env file: cwd, cwd/grip/ (grip-stg layout), then up to three parent levels."""
     cwd = Path.cwd()
-    candidates = [cwd / ".env"] + [cwd.parents[i] / ".env" for i in range(3)]
+    candidates = [cwd / ".env", cwd / "grip" / ".env"] + [cwd.parents[i] / ".env" for i in range(3)]
     for p in candidates:
         if p.exists():
             return p

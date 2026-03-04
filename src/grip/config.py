@@ -11,6 +11,21 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+
+def _load_dotenv() -> None:
+    """Search for a .env file starting from the current working directory,
+    then from a 'grip/' subdirectory within it (the layout used by grip-stg).
+    Does not override variables that are already set in the shell environment."""
+    for candidate in (
+        Path.cwd() / ".env",
+        Path.cwd() / "grip" / ".env",
+    ):
+        if candidate.is_file():
+            load_dotenv(candidate, override=False)
+            return
+
 
 def _env_list(key: str, default: list[str]) -> list[str]:
     """Parse a comma-separated env var into a list, falling back to default."""
@@ -91,7 +106,8 @@ class Settings:
 
 
 def load_settings() -> Settings:
-    """Load settings from environment variables."""
+    """Load settings from environment variables (and .env if present)."""
+    _load_dotenv()
     return Settings(
         search_terms=_env_list("GRIP_SEARCH_TERMS", ["machine learning"]),
         days_lookback=int(os.environ.get("GRIP_DAYS_LOOKBACK", "1")),
