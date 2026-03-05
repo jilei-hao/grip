@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 import anthropic
 
-from grip.config import Settings, load_settings
+from grip.config import Settings, get_httpx_client, load_settings
 from grip.feedback.collector import FeedbackCollector
 from grip.profile.manager import ProfileManager
 from grip.scorer.prompts import PROFILE_UPDATE_PROMPT
@@ -21,7 +21,10 @@ class ProfileUpdater:
         self._settings = settings or load_settings()
         self._collector = FeedbackCollector(self._settings)
         self._profile = ProfileManager(self._settings)
-        self._client = anthropic.Anthropic(api_key=self._settings.anthropic_api_key)
+        self._client = anthropic.Anthropic(
+            api_key=self._settings.anthropic_api_key,
+            http_client=get_httpx_client(),
+        )
 
     def run_update(self) -> bool:
         """

@@ -8,6 +8,8 @@ The Settings class is a simple dataclass — no magic, easy to inspect and test.
 from __future__ import annotations
 
 import os
+import ssl
+import httpx
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -118,3 +120,26 @@ def load_settings() -> Settings:
         feedback_window_days=int(os.environ.get("GRIP_FEEDBACK_DAYS", "7")),
         min_feedback_to_update=int(os.environ.get("GRIP_MIN_FEEDBACK", "5")),
     )
+
+
+def get_ssl_context() -> ssl.SSLContext:
+    """Return an SSL context for outbound HTTPS requests.
+
+    By default, certificate verification is enabled. If your network uses a
+    proxy that performs SSL inspection (corporate MITM proxy), certificate
+    verification will fail with 'self-signed certificate in certificate chain'.
+    Set GRIP_SSL_VERIFY=false in your environment or .env to disable it.
+    """
+    ctx = ssl.create_default_context()
+    if os.environ.get("GRIP_SSL_VERIFY", "true").strip().lower() in ("false", "0", "no"):
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+    return ctx
+
+
+def get_httpx_client() -> httpx.Client | None:
+    """Return a custom httpx.Client with SSL verification disabled when
+    GRIP_SSL_VERIFY=false, or None to let the caller use the default client."""
+    if os.environ.get("GRIP_SSL_VERIFY", "true").strip().lower() in ("false", "0", "no"):
+        return httpx.Client(verify=False)
+    return None

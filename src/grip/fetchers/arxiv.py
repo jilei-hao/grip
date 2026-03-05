@@ -8,6 +8,7 @@ import urllib.parse
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 
+from grip.config import get_ssl_context
 from grip.fetchers.base import BaseFetcher, Paper
 
 
@@ -36,10 +37,10 @@ class ArxivFetcher(BaseFetcher):
             "sortOrder": "descending",
         })
 
-        url = f"http://export.arxiv.org/api/query?{params}"
+        url = f"https://export.arxiv.org/api/query?{params}"
         print(f"[arXiv] Fetching papers...")
 
-        with urllib.request.urlopen(url) as resp:
+        with urllib.request.urlopen(url, context=get_ssl_context()) as resp:
             xml_data = resp.read()
 
         root = ET.fromstring(xml_data)

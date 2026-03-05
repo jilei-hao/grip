@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 import anthropic
 
-from grip.config import Settings, load_settings
+from grip.config import Settings, get_httpx_client, load_settings
 from grip.fetchers.base import Paper
 from grip.scorer.prompts import SCORING_SYSTEM_PROMPT
 
@@ -17,7 +17,10 @@ class ClaudeScorer:
 
     def __init__(self, settings: Settings | None = None) -> None:
         self._settings = settings or load_settings()
-        self._client = anthropic.Anthropic(api_key=self._settings.anthropic_api_key)
+        self._client = anthropic.Anthropic(
+            api_key=self._settings.anthropic_api_key,
+            http_client=get_httpx_client(),
+        )
 
     def score(self, papers: list[Paper], interest_profile: str) -> list[dict]:
         """

@@ -17,7 +17,7 @@ from pathlib import Path
 import anthropic
 import yaml
 
-from grip.config import Settings, load_settings
+from grip.config import Settings, get_httpx_client, load_settings
 from grip.profile.manager import ProfileManager
 from grip.scorer.prompts import PROFILE_SYNTHESIS_PROMPT
 
@@ -98,7 +98,7 @@ def synthesize_profile(settings: Settings | None = None, dry_run: bool = False) 
     if not api_key:
         raise EnvironmentError("ANTHROPIC_API_KEY environment variable is not set.")
 
-    client = anthropic.Anthropic(api_key=api_key)
+    client = anthropic.Anthropic(api_key=api_key, http_client=get_httpx_client())
     print(f"[synthesizer] Calling Claude ({cfg.profile_update_model}) to synthesize profile…")
     message = client.messages.create(
         model=cfg.profile_update_model,

@@ -23,7 +23,7 @@ import json
 import urllib.request
 from urllib.error import URLError
 
-from grip.config import Settings, load_settings
+from grip.config import Settings, get_ssl_context, load_settings
 from grip.notifier.formatter import format_digest, format_digest_header, format_paper_block
 
 _SLACK_API = "https://slack.com/api/chat.postMessage"
@@ -96,7 +96,7 @@ class SlackNotifier:
             },
         )
         try:
-            with urllib.request.urlopen(req) as resp:
+            with urllib.request.urlopen(req, context=get_ssl_context()) as resp:
                 body = json.loads(resp.read().decode("utf-8"))
                 if body.get("ok"):
                     return body["ts"]
@@ -119,7 +119,7 @@ class SlackNotifier:
             headers={"Content-Type": "application/json"},
         )
         try:
-            with urllib.request.urlopen(req) as resp:
+            with urllib.request.urlopen(req, context=get_ssl_context()) as resp:
                 if resp.status == 200:
                     print(f"[slack] Webhook: posted {len(papers)} papers.")
                     return True

@@ -13,6 +13,7 @@ import time
 import urllib.request
 from datetime import datetime, timedelta
 
+from grip.config import get_ssl_context
 from grip.fetchers.base import BaseFetcher, Paper
 
 
@@ -125,7 +126,7 @@ class BioRxivFetcher(BaseFetcher):
         """GET *url* with exponential backoff. Returns parsed JSON or None on failure."""
         for attempt in range(1, max_retries + 1):
             try:
-                with urllib.request.urlopen(url, timeout=timeout) as resp:
+                with urllib.request.urlopen(url, timeout=timeout, context=get_ssl_context()) as resp:
                     return json.loads(resp.read())
             except Exception as exc:
                 if attempt == max_retries:

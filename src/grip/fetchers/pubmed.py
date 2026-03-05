@@ -17,6 +17,7 @@ import urllib.parse
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
+from grip.config import get_ssl_context
 from grip.fetchers.base import BaseFetcher, Paper
 
 # Month abbreviations used in PubMed XML dates
@@ -93,7 +94,7 @@ class PubMedFetcher(BaseFetcher):
 
         search_url = f"{self.ESEARCH_URL}?{urllib.parse.urlencode(search_params)}"
         try:
-            with urllib.request.urlopen(search_url, timeout=15) as resp:
+            with urllib.request.urlopen(search_url, timeout=15, context=get_ssl_context()) as resp:
                 search_data = json.loads(resp.read())
         except Exception as exc:
             print(f"[PubMed] esearch failed: {exc}")
@@ -115,7 +116,7 @@ class PubMedFetcher(BaseFetcher):
 
         fetch_url = f"{self.EFETCH_URL}?{urllib.parse.urlencode(fetch_params)}"
         try:
-            with urllib.request.urlopen(fetch_url, timeout=30) as resp:
+            with urllib.request.urlopen(fetch_url, timeout=30, context=get_ssl_context()) as resp:
                 xml_data = resp.read()
         except Exception as exc:
             print(f"[PubMed] efetch failed: {exc}")

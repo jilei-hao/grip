@@ -20,7 +20,7 @@ from pathlib import Path
 import anthropic
 import yaml
 
-from grip.config import Settings, load_settings
+from grip.config import Settings, get_httpx_client, load_settings
 from grip.profile.synthesizer import _find_latest_prefs, _format_member_responses
 from grip.scorer.prompts import SEARCH_TERM_REFINEMENT_PROMPT
 
@@ -68,7 +68,7 @@ def refine_search_terms(settings: Settings | None = None, dry_run: bool = False)
     if not api_key:
         raise EnvironmentError("ANTHROPIC_API_KEY environment variable is not set.")
 
-    client = anthropic.Anthropic(api_key=api_key)
+    client = anthropic.Anthropic(api_key=api_key, http_client=get_httpx_client())
     print(f"[refine-search] Calling Claude ({cfg.profile_update_model}) to refine search terms…")
     message = client.messages.create(
         model=cfg.profile_update_model,
