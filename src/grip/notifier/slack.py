@@ -24,6 +24,7 @@ import urllib.request
 from urllib.error import URLError
 
 from grip.config import Settings, get_ssl_context, load_settings
+from grip.feedback.digest_registry import DigestRegistry
 from grip.notifier.formatter import format_digest, format_digest_header, format_paper_block
 
 _SLACK_API = "https://slack.com/api/chat.postMessage"
@@ -61,15 +62,31 @@ class SlackNotifier:
 
         # 2. Post each paper as a thread reply
         failures = 0
+        posted_papers: list[dict] = []
         for i, paper in enumerate(papers, 1):
             blocks = format_paper_block(paper, i)
             reply_ts = self._api_post(token, channel, blocks, thread_ts=ts)
             if reply_ts is None:
                 print(f"[slack] Failed to post paper {i} to thread.")
                 failures += 1
+            else:
+                posted_papers.append({
+                    "ts": reply_ts,
+                    "title": paper.get("title", ""),
+                    "url": paper.get("url", ""),
+                    "relevance_score": paper.get("relevance_score"),
+                })
 
-        ok_count = len(papers) - failures
+        ok_count = len(posted_papers)
         print(f"[slack] Threaded digest posted: {ok_count}/{len(papers)} papers in thread.")
+
+        if posted_papers:
+            DigestRegistry(self._settings).save(
+                header_ts=ts,
+                channel=channel,
+                papers=posted_papers,
+            )
+
         return failures == 0
 
     def _api_post(

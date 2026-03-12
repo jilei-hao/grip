@@ -96,9 +96,13 @@ Positively received (👍) papers:
 Negatively received (👎) papers:
 {thumbs_down_papers}
 
+Each entry above shows the paper title and URL, reaction counts (👍/👎),
+and any text comments left by lab members in the Slack thread.
+
 TASK:
 Update the interest profile to better reflect what this group actually wants to see.
 - Strengthen themes that appear in 👍 papers
+- Pay special attention to text comments — they carry explicit intent
 - Downweight or add exclusions for themes in 👎 papers
 - Keep the profile concise and specific (aim for <300 words)
 - Preserve any explicit exclusions already in the profile

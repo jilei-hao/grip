@@ -2,9 +2,9 @@
 
 GRIP can post the daily digest in **threaded mode**, where each paper appears as
 a separate thread reply. This lets team members react 👍 / 👎 on individual
-papers, which feeds directly into GRIP's profile-update loop.
+papers and leave text comments, which feeds directly into GRIP's profile-update loop.
 
-Threaded mode requires a **Slack Bot Token** and a **Channel ID**.  
+Threaded mode requires a **Slack Bot Token** and a **Channel ID**.
 If you only have an Incoming Webhook, GRIP falls back to a single non-threaded
 post automatically.
 
@@ -27,7 +27,8 @@ post automatically.
    | Scope | Why |
    |---|---|
    | `chat:write` | Post messages and thread replies |
-   | `reactions:read` | Read 👍 / 👎 reactions for feedback (future use) |
+   | `reactions:read` | Read 👍 / 👎 reactions when polling for feedback |
+   | `channels:history` | Read thread replies (text comments) when polling for feedback |
 
 3. Click **Save Changes**.
 
@@ -88,7 +89,24 @@ exports needed.
 
 ---
 
-## 7. Verify
+## 7. (Optional) Enable Real-Time Feedback via Events API
+
+By default, feedback is collected by **polling** Slack when you run
+`grip --update-profile`. No extra setup is needed for this.
+
+If you want reactions logged in **real-time** as they happen, you can also run
+the GRIP feedback server. See [feedback-server-setup.md](feedback-server-setup.md)
+for the full guide. This requires one extra env variable:
+
+```dotenv
+GRIP_SLACK_SIGNING_SECRET=your-signing-secret-here
+```
+
+Find it in the Slack app settings under **Basic Information → App Credentials**.
+
+---
+
+## 8. Verify
 
 Run GRIP manually to confirm the bot posts correctly:
 
@@ -97,7 +115,16 @@ grip
 ```
 
 You should see a compact digest header in the channel and one thread reply per
-paper. React 👍 or 👎 on any thread reply to record feedback.
+paper. React 👍 or 👎 on any thread reply — or leave a text comment in the
+thread — to record feedback.
+
+Run the profile update to confirm feedback collection works:
+
+```sh
+grip --update-profile
+```
+
+Look for `[feedback] Polled N papers, wrote M entries.` in the output.
 
 ---
 
@@ -108,5 +135,6 @@ paper. React 👍 or 👎 on any thread reply to record feedback.
 | `GRIP_SLACK_BOT_TOKEN` | Threaded mode | Bot User OAuth Token (`xoxb-…`) |
 | `GRIP_SLACK_CHANNEL_ID` | Threaded mode | Target channel ID (`C…`) |
 | `GRIP_SLACK_WEBHOOK` | Webhook fallback | Incoming Webhook URL |
+| `GRIP_SLACK_SIGNING_SECRET` | Events API server | Verifies Slack webhook signatures |
 
 At least one of (token + channel) or webhook must be configured.

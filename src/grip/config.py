@@ -69,6 +69,10 @@ class Settings:
         return self.data_dir / "feedback_log"
 
     @property
+    def digest_log_dir(self) -> Path:
+        return self.data_dir / "digest_log"
+
+    @property
     def profile_versions_dir(self) -> Path:
         return self.data_dir / "profile_versions"
 
@@ -98,6 +102,13 @@ class Settings:
     def slack_channel_id(self) -> str | None:
         """Slack channel ID (e.g. C01234ABCDE) used with slack_bot_token."""
         return os.environ.get("GRIP_SLACK_CHANNEL_ID") or None
+
+    @property
+    def slack_signing_secret(self) -> str | None:
+        """Slack app signing secret for verifying Events API webhook signatures.
+        Found under Basic Information → App Credentials in the Slack app settings.
+        Set GRIP_SLACK_SIGNING_SECRET in environment or .env file."""
+        return os.environ.get("GRIP_SLACK_SIGNING_SECRET") or None
 
     @property
     def ncbi_api_key(self) -> str | None:

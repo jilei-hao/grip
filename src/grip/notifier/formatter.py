@@ -50,8 +50,7 @@ def format_digest_header(selected_papers: list[dict], date: str | None = None) -
                     "type": "mrkdwn",
                     "text": (
                         f"*{len(selected_papers)} paper{'s' if len(selected_papers) != 1 else ''}* matched your profile"
-                        # TODO: re-enable feedback reminder when feedback collection is active
-                        # " · Open the thread 🧵 to read summaries and react 👍 👎 on each paper"
+                        " · Open the thread 🧵 to read summaries and react 👍 👎 on each paper"
                     ),
                 }
             ],
@@ -85,15 +84,13 @@ def format_paper_block(paper: dict, index: int) -> list[dict]:
                 + (f"\n_{reason}_" if reason else ""),
             },
         },
-        # Score (feedback prompt temporarily disabled)
+        # Score
         {
             "type": "context",
             "elements": [
                 {
                     "type": "mrkdwn",
-                    # TODO: re-enable feedback reminder when feedback collection is active
-                    # "text": f"Relevance: *{score}/10* · React 👍 or 👎 to give feedback",
-                    "text": f"Relevance: *{score}/10*",
+                    "text": f"Relevance: *{score}/10* · React 👍 or 👎 to give feedback",
                 }
             ],
         },
@@ -148,17 +145,14 @@ def format_digest(selected_papers: list[dict], date: str | None = None) -> list[
             "elements": [
                 {
                     "type": "mrkdwn",
-                    # TODO: re-enable feedback reminder when feedback collection is active
-                    # "text": f"Score: *{score}/10* · React 👍 👎 to give feedback",
-                    "text": f"Score: *{score}/10*",
+                    "text": f"Score: *{score}/10* · React 👍 👎 to give feedback",
                 }
             ],
         })
         blocks.append({"type": "divider"})
 
-    # TODO: re-enable feedback footer when feedback collection is active
-    # blocks.append({
-    #     "type": "context",
-    #     "elements": [{"type": "mrkdwn", "text": "GRIP · Your reactions help improve future selections"}],
-    # })
+    blocks.append({
+        "type": "context",
+        "elements": [{"type": "mrkdwn", "text": "GRIP · Your reactions help improve future selections"}],
+    })
     return blocks

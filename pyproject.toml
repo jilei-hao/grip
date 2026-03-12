@@ -45,6 +45,7 @@ dev = [
 grip = "grip.cli:main"
 grip-update-profile = "grip.cli:update_profile"
 grip-synthesize-profile = "grip.cli:synthesize_profile_entry"
+grip-feedback-server = "grip.server:main"
 
 [project.urls]
 Repository = "https://github.com/your-org/grip"
