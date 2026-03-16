@@ -72,10 +72,15 @@ class FeedbackCollector:
         thread_comments_cache: dict[str, list[str]] = {}
 
         count = 0
+        already_logged_reaction_ts = {
+            e.get("message_ts")
+            for e in self.load_recent()
+            if e.get("event_type") == "reaction_poll"
+        }
         for paper in recent_papers:
             paper_ts = paper.get("ts")
             paper_channel = paper.get("channel") or channel
-            if not paper_ts:
+            if not paper_ts or paper_ts in already_logged_reaction_ts:
                 continue
 
             # ── Reactions ──────────────────────────────────────────────────
