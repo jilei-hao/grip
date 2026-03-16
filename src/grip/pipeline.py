@@ -77,7 +77,7 @@ def run_digest(settings: Settings | None = None, dry_run: bool = False) -> list[
         return []
 
     # 4. Score with Claude
-    selected = ClaudeScorer(s).score(papers, profile)
+    selected, selection_notes = ClaudeScorer(s).score(papers, profile)
 
     if not selected:
         print("[pipeline] No papers selected. Check interest profile or search terms.")
@@ -89,7 +89,7 @@ def run_digest(settings: Settings | None = None, dry_run: bool = False) -> list[
         for i, p in enumerate(selected, 1):
             print(f"  {i}. [{p.get('relevance_score', '?')}/10] {p['title']}")
     else:
-        SlackNotifier(s).post_digest(selected)
+        SlackNotifier(s).post_digest(selected, profile=profile, selection_notes=selection_notes)
 
     return selected
 

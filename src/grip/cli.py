@@ -3,11 +3,8 @@ GRIP — CLI Entry Point
 
 Registered as console_scripts in pyproject.toml, so after `pip install`:
 
-    grip                        # run daily digest
+    grip                        # update profile, then run daily digest
     grip --dry-run              # fetch + score, print results, skip Slack
-    grip --update-profile       # synthesize profile from member_prefs, refine
-                                #   search terms, then apply feedback reactions
-    grip --update-profile --dry-run  # preview each step without saving
     grip init                   # copy starter profile to current directory
     grip version                # print version
 
@@ -29,15 +26,7 @@ def main() -> None:
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Fetch and score papers without posting to Slack; or preview synthesize-profile without saving.",
-    )
-    parser.add_argument(
-        "--update-profile",
-        action="store_true",
-        help=(
-            "Full profile update: synthesize interest_profile.txt from member_prefs_*.yml, "
-            "refine search terms, then apply feedback reactions."
-        ),
+        help="Fetch and score papers without posting to Slack.",
     )
     parser.add_argument(
         "command",
@@ -66,69 +55,41 @@ def main() -> None:
         _init_profile()
         return
 
-    if args.update_profile:
-        from grip.profile.synthesizer import synthesize_profile
-        from grip.profile.search_refiner import refine_search_terms
-        from grip.pipeline import run_profile_update
-
-        print("── Step 1/3: Synthesize profile from member_prefs ──")
-        synthesize_profile(dry_run=args.dry_run)
-
-        print("── Step 2/3: Refine search terms ──")
-        refine_search_terms(dry_run=args.dry_run)
-
-        print("── Step 3/3: Apply feedback reactions ──")
-        run_profile_update()
-
-        print("── Profile update complete ──")
-        return
+    _run_profile_update(dry_run=args.dry_run)
 
     from grip.pipeline import run_digest
     selected = run_digest(dry_run=args.dry_run)
     sys.exit(0 if selected else 1)
 
 
-def update_profile() -> None:
-    """Secondary entry point: grip-update-profile"""
-    import argparse as _ap
-    p = _ap.ArgumentParser(prog="grip-update-profile")
-    p.add_argument("--dry-run", action="store_true", help="Preview each step without saving.")
-    args = p.parse_args()
-    try:
-        from dotenv import load_dotenv
-        load_dotenv()
-    except ImportError:
-        pass
-    from grip.profile.synthesizer import synthesize_profile
+def _run_profile_update(dry_run: bool = False) -> None:
+    from grip.config import load_settings
+    from grip.profile.synthesizer import synthesize_profile, prefs_changed, save_prefs_hash
     from grip.profile.search_refiner import refine_search_terms
     from grip.pipeline import run_profile_update
 
-    print("── Step 1/3: Synthesize profile from member_prefs ──")
-    synthesize_profile(dry_run=args.dry_run)
+    cfg = load_settings()
+    changed = prefs_changed(cfg.data_dir)
 
-    print("── Step 2/3: Refine search terms ──")
-    refine_search_terms(dry_run=args.dry_run)
+    if changed:
+        print("── Step 1/3: Synthesize profile from member_prefs ──")
+        synthesize_profile(settings=cfg, dry_run=dry_run)
+
+        print("── Step 2/3: Refine search terms ──")
+        refine_search_terms(settings=cfg, dry_run=dry_run)
+
+        if not dry_run:
+            save_prefs_hash(cfg.data_dir)
+    else:
+        print("[updater] member_prefs unchanged — skipping profile synthesis and search term refinement.")
+        print("── Step 1/3: Skipped ──")
+        print("── Step 2/3: Skipped ──")
 
     print("── Step 3/3: Apply feedback reactions ──")
     run_profile_update()
 
     print("── Profile update complete ──")
 
-
-def synthesize_profile_entry() -> None:
-    """Secondary entry point: grip-synthesize-profile"""
-    import argparse as _ap
-    p = _ap.ArgumentParser(prog="grip-synthesize-profile")
-    p.add_argument("--dry-run", action="store_true", help="Print result without saving.")
-    args = p.parse_args()
-    try:
-        from dotenv import load_dotenv
-        load_dotenv()
-    except ImportError:
-        pass
-    from grip.profile.synthesizer import synthesize_profile
-    ok = synthesize_profile(dry_run=args.dry_run)
-    sys.exit(0 if ok else 1)
 
 
 def _init_profile() -> None:

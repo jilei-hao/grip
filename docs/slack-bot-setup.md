@@ -2,9 +2,9 @@
 
 GRIP can post the daily digest in **threaded mode**, where each paper appears as
 a separate thread reply. This lets team members react 👍 / 👎 on individual
-papers, which feeds directly into GRIP's profile-update loop.
+papers and leave text comments, which feeds directly into GRIP's profile-update loop.
 
-Threaded mode requires a **Slack Bot Token** and a **Channel ID**.  
+Threaded mode requires a **Slack Bot Token** and a **Channel ID**.
 If you only have an Incoming Webhook, GRIP falls back to a single non-threaded
 post automatically.
 
@@ -27,7 +27,8 @@ post automatically.
    | Scope | Why |
    |---|---|
    | `chat:write` | Post messages and thread replies |
-   | `reactions:read` | Read 👍 / 👎 reactions for feedback (future use) |
+   | `reactions:read` | Read 👍 / 👎 reactions when polling for feedback |
+   | `channels:history` | Read thread replies (text comments) when polling for feedback |
 
 3. Click **Save Changes**.
 
@@ -97,7 +98,16 @@ grip
 ```
 
 You should see a compact digest header in the channel and one thread reply per
-paper. React 👍 or 👎 on any thread reply to record feedback.
+paper. React 👍 or 👎 on any thread reply — or leave a text comment in the
+thread — to record feedback.
+
+Run the profile update to confirm feedback collection works:
+
+```sh
+grip --update-profile
+```
+
+Look for `[feedback] Polled N papers, wrote M entries.` in the output.
 
 ---
 

@@ -21,7 +21,7 @@ pip install -e ".[dev]"
 **1. Configure secrets**
 ```bash
 cp .env.example .env
-# Fill in ANTHROPIC_API_KEY and GRIP_SLACK_WEBHOOK
+# Fill in ANTHROPIC_API_KEY, GRIP_SLACK_BOT_TOKEN, and GRIP_SLACK_CHANNEL_ID
 ```
 
 **2. Initialize your interest profile**
@@ -45,11 +45,21 @@ grip
 
 | Command | Description |
 |---|---|
-| `grip` | Run daily digest and post to Slack |
-| `grip --dry-run` | Fetch + score, print results, skip Slack |
-| `grip --update-profile` | Update profile from recent 👍/👎 feedback |
+| `grip` | Update profile, then run daily digest and post to Slack |
+| `grip --dry-run` | Fetch + score + preview profile update steps, skip Slack |
 | `grip init` | Copy starter `interest_profile.txt` to current dir |
 | `grip version` | Print installed version |
+
+## How the Feedback Loop Works
+
+Each daily digest is posted as a **threaded Slack message**: a compact header lists
+the paper titles, and each paper gets its own thread reply with a full summary.
+A final reply explains why those papers were selected (profile excerpt + scorer notes).
+
+Team members react 👍 or 👎 on individual thread replies, or leave text comments.
+Running `grip --update-profile` polls those reactions and comments via the Slack
+Web API, then calls Claude to revise the group interest profile accordingly.
+No server or webhook endpoint is required — feedback collection is fully pull-based.
 
 ## Project Structure
 
@@ -62,19 +72,24 @@ src/grip/
 ├── fetchers/
 │   ├── base.py              ← Paper dataclass + BaseFetcher ABC
 │   ├── arxiv.py             ← arXiv API (active)
+│   ├── medrxiv_biorxiv.py   ← bioRxiv / medRxiv API (active)
+│   ├── pubmed.py            ← PubMed E-utilities (active)
 │   ├── semantic_scholar.py  ← stub (implement when ready)
 │   └── rss.py               ← stub (implement when ready)
 ├── scorer/
-│   ├── claude_scorer.py     ← Claude API scoring
+│   ├── claude_scorer.py     ← Claude API scoring; returns (papers, selection_notes)
 │   └── prompts.py           ← all prompts (tune here)
 ├── notifier/
-│   ├── slack.py             ← Slack webhook poster
-│   └── formatter.py         ← Block Kit formatting
+│   ├── slack.py             ← threaded bot poster + webhook fallback
+│   └── formatter.py         ← Block Kit formatting (header, paper, explanation blocks)
 ├── feedback/
-│   ├── collector.py         ← logs 👍/👎 from Slack Events API
-│   └── updater.py           ← weekly profile update from feedback
+│   ├── collector.py         ← polls 👍/👎 reactions + thread comments from Slack
+│   ├── digest_registry.py   ← maps Slack message timestamps → paper metadata
+│   └── updater.py           ← profile update from accumulated feedback
 ├── profile/
-│   └── manager.py           ← read/write/version interest profile
+│   ├── manager.py           ← read/write/version interest profile
+│   ├── synthesizer.py       ← synthesize profile from member_prefs_*.yml
+│   └── search_refiner.py    ← refine search terms from profile
 ├── utils/
 │   └── dedup.py             ← deduplication across sources
 ├── tests/
@@ -82,10 +97,19 @@ src/grip/
 │   ├── test_config.py
 │   └── test_feedback.py
 └── data/
-    ├── interest_profile.txt          ← bundled starter profile
+    ├── interest_profile.example.txt  ← bundled starter profile
+    ├── member_prefs_example.yml      ← starter member preferences template
     ├── feedback_log/                 ← YYYY-MM-DD.jsonl per day
+    ├── digest_log/                   ← YYYY-MM-DD.json per day (ts → paper map)
     └── profile_versions/            ← auto-archived history
 ```
+
+## Docs
+
+| Guide | Description |
+|---|---|
+| [docs/slack-bot-setup.md](docs/slack-bot-setup.md) | Create the Slack app, set OAuth scopes, find Channel ID |
+| [docs/paper-sources.md](docs/paper-sources.md) | arXiv, bioRxiv, medRxiv, PubMed — setup and tuning |
 
 ## Adding a New Source
 

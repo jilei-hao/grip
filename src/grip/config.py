@@ -69,6 +69,10 @@ class Settings:
         return self.data_dir / "feedback_log"
 
     @property
+    def digest_log_dir(self) -> Path:
+        return self.data_dir / "digest_log"
+
+    @property
     def profile_versions_dir(self) -> Path:
         return self.data_dir / "profile_versions"
 

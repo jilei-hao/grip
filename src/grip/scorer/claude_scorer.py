@@ -22,10 +22,10 @@ class ClaudeScorer:
             http_client=get_httpx_client(),
         )
 
-    def score(self, papers: list[Paper], interest_profile: str) -> list[dict]:
+    def score(self, papers: list[Paper], interest_profile: str) -> tuple[list[dict], str]:
         """
         Score papers against the interest profile.
-        Returns selected papers with summaries, ranked by relevance.
+        Returns a tuple of (selected papers with summaries, ranked by relevance, selection notes).
         """
         papers_text = "\n\n---\n\n".join(p.to_prompt_str() for p in papers)
         top_n = self._settings.top_n_papers
@@ -57,4 +57,4 @@ class ClaudeScorer:
         selected = result.get("selected", [])
         notes = result.get("selection_notes", "")
         print(f"[scorer] Selected {len(selected)} papers. Notes: {notes}")
-        return selected
+        return selected, notes

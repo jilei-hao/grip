@@ -50,8 +50,7 @@ def format_digest_header(selected_papers: list[dict], date: str | None = None) -
                     "type": "mrkdwn",
                     "text": (
                         f"*{len(selected_papers)} paper{'s' if len(selected_papers) != 1 else ''}* matched your profile"
-                        # TODO: re-enable feedback reminder when feedback collection is active
-                        # " · Open the thread 🧵 to read summaries and react 👍 👎 on each paper"
+                        " · Open the thread 🧵 to read summaries and react 👍 👎 on each paper"
                     ),
                 }
             ],
@@ -85,15 +84,13 @@ def format_paper_block(paper: dict, index: int) -> list[dict]:
                 + (f"\n_{reason}_" if reason else ""),
             },
         },
-        # Score (feedback prompt temporarily disabled)
+        # Score
         {
             "type": "context",
             "elements": [
                 {
                     "type": "mrkdwn",
-                    # TODO: re-enable feedback reminder when feedback collection is active
-                    # "text": f"Relevance: *{score}/10* · React 👍 or 👎 to give feedback",
-                    "text": f"Relevance: *{score}/10*",
+                    "text": f"Relevance: *{score}/10* · React 👍 or 👎 to give feedback",
                 }
             ],
         },
@@ -112,6 +109,55 @@ def format_paper_block(paper: dict, index: int) -> list[dict]:
 
     blocks.append({"type": "divider"})
     return blocks
+
+
+def format_feed_explanation(
+    profile: str,
+    selection_notes: str = "",
+) -> list[dict]:
+    """
+    Final thread reply explaining why today's papers were selected.
+    Incorporates the group interest profile and scorer notes.
+    Surfaces any feedback-driven profile updates if a changelog line is present.
+    """
+    # Extract key profile themes: first non-empty lines up to ~300 chars
+    profile_lines = [l.strip() for l in profile.strip().splitlines() if l.strip()]
+
+    # Detect feedback changelog (e.g. "Updated YYYY-MM-DD: ...")
+    changelog_lines = [l for l in profile_lines if l.lower().startswith("updated ")]
+    latest_update = changelog_lines[-1] if changelog_lines else None
+
+    # Build a short profile excerpt (skip changelog lines, cap at ~250 chars)
+    excerpt_parts: list[str] = []
+    total = 0
+    for line in profile_lines:
+        if line.lower().startswith("updated "):
+            continue
+        if total + len(line) > 250:
+            break
+        excerpt_parts.append(line)
+        total += len(line)
+    profile_excerpt = " ".join(excerpt_parts)
+    if len(profile_excerpt) < len(" ".join(
+        l for l in profile_lines if not l.lower().startswith("updated ")
+    )):
+        profile_excerpt += "…"
+
+    text_parts = ["*🔍 Why these papers?*"]
+    text_parts.append(f"_Profile:_ {profile_excerpt}")
+    if selection_notes:
+        text_parts.append(f"_Today's batch:_ {selection_notes}")
+    if latest_update:
+        text_parts.append(f"_Profile last refined from feedback:_ {latest_update}")
+    text_parts.append("\nReact 👍 or 👎 on any paper above — your feedback shapes future digests.")
+
+    return [
+        {"type": "divider"},
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": "\n".join(text_parts)},
+        },
+    ]
 
 
 # ── Webhook fallback (single post) ────────────────────────────────────────────
@@ -148,17 +194,14 @@ def format_digest(selected_papers: list[dict], date: str | None = None) -> list[
             "elements": [
                 {
                     "type": "mrkdwn",
-                    # TODO: re-enable feedback reminder when feedback collection is active
-                    # "text": f"Score: *{score}/10* · React 👍 👎 to give feedback",
-                    "text": f"Score: *{score}/10*",
+                    "text": f"Score: *{score}/10* · React 👍 👎 to give feedback",
                 }
             ],
         })
         blocks.append({"type": "divider"})
 
-    # TODO: re-enable feedback footer when feedback collection is active
-    # blocks.append({
-    #     "type": "context",
-    #     "elements": [{"type": "mrkdwn", "text": "GRIP · Your reactions help improve future selections"}],
-    # })
+    blocks.append({
+        "type": "context",
+        "elements": [{"type": "mrkdwn", "text": "GRIP · Your reactions help improve future selections"}],
+    })
     return blocks
