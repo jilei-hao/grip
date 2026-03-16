@@ -57,9 +57,10 @@ the paper titles, and each paper gets its own thread reply with a full summary.
 A final reply explains why those papers were selected (profile excerpt + scorer notes).
 
 Team members react 👍 or 👎 on individual thread replies, or leave text comments.
-Running `grip --update-profile` polls those reactions and comments via the Slack
-Web API, then calls Claude to revise the group interest profile accordingly.
-No server or webhook endpoint is required — feedback collection is fully pull-based.
+Each time `grip` runs, it automatically polls those reactions and comments via
+the Slack Web API, then calls Claude to revise the group interest profile
+accordingly. No server or webhook endpoint is required — feedback collection is
+fully pull-based.
 
 ## Project Structure
 
