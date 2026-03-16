@@ -1,5 +1,6 @@
 """Generate grip communication diagram as PNG (polling-only architecture)."""
 import math
+from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 W, H = 1200, 780
@@ -193,6 +194,6 @@ for i, (c, dash, txt) in enumerate(items):
     draw_arrow(p1, p2, c, dashed=dash)
     d.text((cx+108, ly+6), txt, fill=C_DIM, font=font(10), anchor="lm")
 
-out = "/home/jileihao/dev/grip/docs/architecture.png"
-img.save(out)
-print(f"Saved: {out}  ({W}×{H})")
+out_path = Path(__file__).parent / "architecture.png"
+img.save(out_path)
+print(f"Saved: {out_path}  ({W}×{H})")
