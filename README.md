@@ -45,10 +45,11 @@ grip
 
 | Command | Description |
 |---|---|
-| `grip` | Run daily digest and post to Slack |
+| `grip` | Update profile, then run daily digest and post to Slack |
 | `grip --dry-run` | Fetch + score, print results, skip Slack |
-| `grip --update-profile` | Poll Slack feedback and update profile from recent 👍/👎 reactions and comments |
-| `grip synthesize-profile` | Synthesize a group profile from `member_prefs_*.yml` via Claude |
+| `grip-update-profile` | Standalone: synthesize profile from member prefs + apply feedback |
+| `grip-update-profile --dry-run` | Preview each profile update step without saving |
+| `grip-synthesize-profile` | Standalone: synthesize group profile from `member_prefs_*.yml` via Claude |
 | `grip init` | Copy starter `interest_profile.txt` to current dir |
 | `grip version` | Print installed version |
 
