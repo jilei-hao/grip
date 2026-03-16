@@ -33,6 +33,23 @@ class FeedbackCollector:
         self._log_dir = self._settings.feedback_log_dir
         self._log_dir.mkdir(parents=True, exist_ok=True)
 
+    def handle_reaction(self, *args, **kwargs) -> int:
+        """
+        Deprecated compatibility shim for the old event-driven feedback API.
+
+        The previous implementation accepted individual reaction events.
+        The collector now works in polling mode via :meth:`poll_feedback`.
+
+        This method is kept only to avoid AttributeError in older tests or
+        callers. It raises a RuntimeError to clearly indicate that the
+        event-based API has been removed and that callers should be updated
+        to use :meth:`poll_feedback` instead.
+        """
+        raise RuntimeError(
+            "FeedbackCollector.handle_reaction() has been removed. "
+            "Use FeedbackCollector.poll_feedback(token, channel) instead."
+        )
+
     def poll_feedback(self, token: str, channel: str) -> int:
         """
         Poll Slack for reactions and thread replies on all papers in the
