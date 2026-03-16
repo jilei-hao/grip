@@ -94,14 +94,14 @@ d.text((W//2, 6), "GRIP  ·  Communication Architecture", fill=C_WHITE, font=fon
 # grip CLI
 GX, GY, GW, GH = 50, 70, 340, 210
 rbox(GX, GY, GW, GH, BG_BOX, BDR_LOCAL, title="grip  (CLI)", lines=[
-    "grip run",
-    "  1. fetch papers from sources",
-    "  2. score & rank with Claude",
-    "  3. post digest to Slack",
-    "grip --update-profile",
-    "  4. poll Slack for reactions",
-    "  5. read feedback_log/",
-    "  6. update profile via Claude",
+    "grip [--dry-run]",
+    "  1. poll Slack for reactions",
+    "  2. update interest profile",
+    "  3. fetch papers from sources",
+    "  4. score & rank with Claude",
+    "  5. post digest to Slack",
+    "",
+    "  (profile update is automatic)",
 ])
 
 # Paper Fetchers
