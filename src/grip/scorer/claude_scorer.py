@@ -57,4 +57,4 @@ class ClaudeScorer:
         selected = result.get("selected", [])
         notes = result.get("selection_notes", "")
         print(f"[scorer] Selected {len(selected)} papers. Notes: {notes}")
-        return selected
+        return selected, notes

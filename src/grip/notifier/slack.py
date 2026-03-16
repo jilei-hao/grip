@@ -25,7 +25,7 @@ from urllib.error import URLError
 
 from grip.config import Settings, get_ssl_context, load_settings
 from grip.feedback.digest_registry import DigestRegistry
-from grip.notifier.formatter import format_digest, format_digest_header, format_paper_block
+from grip.notifier.formatter import format_digest, format_digest_header, format_feed_explanation, format_paper_block
 
 _SLACK_API = "https://slack.com/api/chat.postMessage"
 
@@ -35,22 +35,35 @@ class SlackNotifier:
     def __init__(self, settings: Settings | None = None) -> None:
         self._settings = settings or load_settings()
 
-    def post_digest(self, selected_papers: list[dict]) -> bool:
+    def post_digest(
+        self,
+        selected_papers: list[dict],
+        profile: str = "",
+        selection_notes: str = "",
+    ) -> bool:
         """Post formatted digest to Slack. Returns True on success."""
         token = self._settings.slack_bot_token
         channel = self._settings.slack_channel_id
 
         if token and channel:
-            return self._post_threaded(selected_papers, token, channel)
+            return self._post_threaded(selected_papers, token, channel, profile, selection_notes)
 
         # Fallback: single webhook post
         return self._post_webhook(selected_papers)
 
     # ── Threaded (Web API) ────────────────────────────────────────────────────
 
-    def _post_threaded(self, papers: list[dict], token: str, channel: str) -> bool:
+    def _post_threaded(
+        self,
+        papers: list[dict],
+        token: str,
+        channel: str,
+        profile: str = "",
+        selection_notes: str = "",
+    ) -> bool:
         """
-        Post header to channel, then each paper as a thread reply.
+        Post header to channel, then each paper as a thread reply,
+        and finally an explanation post summarising why this feed was generated.
         Uses the Slack Web API (chat.postMessage) with Authorization header.
         """
         # 1. Post header; capture ts for threading
@@ -86,6 +99,12 @@ class SlackNotifier:
                 channel=channel,
                 papers=posted_papers,
             )
+
+        # 3. Post explanation as final thread reply
+        if profile:
+            explanation_blocks = format_feed_explanation(profile, selection_notes)
+            if self._api_post(token, channel, explanation_blocks, thread_ts=ts) is None:
+                print("[slack] Failed to post feed explanation.")
 
         return failures == 0
 
