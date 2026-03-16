@@ -139,6 +139,6 @@ class BioRxivFetcher(BaseFetcher):
                         )
                     return None
                 wait = 2 ** attempt  # 2s, 4s
-                print(f"[{self.source_name}] Attempt {attempt} failed ({exc}). Retrying in {wait}s…")
+                print(f"[{self.source_name}] Attempt {attempt} failed (cursor={cursor}, {exc}). Retrying in {wait}s…")
                 time.sleep(wait)
         return None  # unreachable, but satisfies type checker

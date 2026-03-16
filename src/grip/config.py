@@ -104,13 +104,6 @@ class Settings:
         return os.environ.get("GRIP_SLACK_CHANNEL_ID") or None
 
     @property
-    def slack_signing_secret(self) -> str | None:
-        """Slack app signing secret for verifying Events API webhook signatures.
-        Found under Basic Information → App Credentials in the Slack app settings.
-        Set GRIP_SLACK_SIGNING_SECRET in environment or .env file."""
-        return os.environ.get("GRIP_SLACK_SIGNING_SECRET") or None
-
-    @property
     def ncbi_api_key(self) -> str | None:
         """Optional NCBI API key. Raises the E-utilities rate limit from 3 to
         10 requests/second. Get one free at https://www.ncbi.nlm.nih.gov/account/

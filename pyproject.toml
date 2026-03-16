@@ -24,13 +24,10 @@ dependencies = [
 # Install when you're ready to add these sources
 rss = ["feedparser>=6.0.0"]
 semantic = ["requests>=2.31.0"]
-# Install for the Slack Events API feedback server
-feedback-server = ["flask>=3.0.0"]
 # Install everything
 all = [
     "feedparser>=6.0.0",
     "requests>=2.31.0",
-    "flask>=3.0.0",
 ]
 # Dev tools
 dev = [
@@ -45,7 +42,6 @@ dev = [
 grip = "grip.cli:main"
 grip-update-profile = "grip.cli:update_profile"
 grip-synthesize-profile = "grip.cli:synthesize_profile_entry"
-grip-feedback-server = "grip.server:main"
 
 [project.urls]
 Repository = "https://github.com/your-org/grip"

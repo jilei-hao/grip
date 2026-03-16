@@ -66,6 +66,7 @@ class DigestRegistry:
             if record is None:
                 continue
             channel = record.get("channel", "")
+            header_ts = record.get("header_ts", "")
             for p in record.get("papers", []):
-                papers.append({**p, "channel": channel, "date": date})
+                papers.append({**p, "channel": channel, "date": date, "header_ts": header_ts})
         return papers

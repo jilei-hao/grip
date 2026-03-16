@@ -89,24 +89,7 @@ exports needed.
 
 ---
 
-## 7. (Optional) Enable Real-Time Feedback via Events API
-
-By default, feedback is collected by **polling** Slack when you run
-`grip --update-profile`. No extra setup is needed for this.
-
-If you want reactions logged in **real-time** as they happen, you can also run
-the GRIP feedback server. See [feedback-server-setup.md](feedback-server-setup.md)
-for the full guide. This requires one extra env variable:
-
-```dotenv
-GRIP_SLACK_SIGNING_SECRET=your-signing-secret-here
-```
-
-Find it in the Slack app settings under **Basic Information → App Credentials**.
-
----
-
-## 8. Verify
+## 7. Verify
 
 Run GRIP manually to confirm the bot posts correctly:
 
@@ -135,6 +118,5 @@ Look for `[feedback] Polled N papers, wrote M entries.` in the output.
 | `GRIP_SLACK_BOT_TOKEN` | Threaded mode | Bot User OAuth Token (`xoxb-…`) |
 | `GRIP_SLACK_CHANNEL_ID` | Threaded mode | Target channel ID (`C…`) |
 | `GRIP_SLACK_WEBHOOK` | Webhook fallback | Incoming Webhook URL |
-| `GRIP_SLACK_SIGNING_SECRET` | Events API server | Verifies Slack webhook signatures |
 
 At least one of (token + channel) or webhook must be configured.

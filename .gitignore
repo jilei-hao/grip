@@ -94,3 +94,5 @@ src/grip/data/member_prefs_*.yml
 src/grip/data/interest_profile.txt
 interest_profile.txt
 profile_versions/
+
+data/**

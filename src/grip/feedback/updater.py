@@ -96,16 +96,31 @@ class ProfileUpdater:
 
         positive = [f for f in feedback if _is_positive(f)]
         negative = [f for f in feedback if _is_negative(f)]
+        thread_comments = [f for f in feedback if f.get("event_type") == "thread_comment"]
+
+        # Flatten and deduplicate general comments across all thread_comment entries
+        seen: set[str] = set()
+        general: list[str] = []
+        for entry in thread_comments:
+            for c in entry.get("comments", []):
+                if c not in seen:
+                    seen.add(c)
+                    general.append(c)
+
+        general_comments_block = (
+            "\n".join(f'- "{c}"' for c in general) if general else "(none)"
+        )
 
         print(
             f"[updater] Updating profile from {len(feedback)} feedback entries "
-            f"({len(positive)} 👍, {len(negative)} 👎)..."
+            f"({len(positive)} 👍, {len(negative)} 👎, {len(general)} general comments)..."
         )
 
         prompt = PROFILE_UPDATE_PROMPT.format(
             current_profile=self._profile.load(),
             thumbs_up_papers=_format_feedback_block(positive),
             thumbs_down_papers=_format_feedback_block(negative),
+            general_comments=general_comments_block,
         )
 
         response = self._client.messages.create(

@@ -11,6 +11,7 @@ Usage:
 
 from __future__ import annotations
 
+import hashlib
 import os
 from pathlib import Path
 
@@ -22,12 +23,40 @@ from grip.profile.manager import ProfileManager
 from grip.scorer.prompts import PROFILE_SYNTHESIS_PROMPT
 
 
+_PREFS_HASH_FILE = ".member_prefs_hash"
+
+
 def _find_latest_prefs(data_dir: Path) -> Path | None:
     """Return the most recent member_prefs_*.yml file, or None if none exist."""
     candidates = sorted(data_dir.glob("member_prefs_*.yml"), reverse=True)
     # Skip the example template
     candidates = [p for p in candidates if p.name != "member_prefs_example.yml"]
     return candidates[0] if candidates else None
+
+
+def _compute_prefs_hash(prefs_file: Path) -> str:
+    """Return a hash string encoding both the filename and file content."""
+    digest = hashlib.sha256(prefs_file.read_bytes()).hexdigest()
+    return f"{prefs_file.name}:{digest}"
+
+
+def prefs_changed(data_dir: Path) -> bool:
+    """Return True if the latest member_prefs file differs from the last recorded hash."""
+    prefs_file = _find_latest_prefs(data_dir)
+    if prefs_file is None:
+        return False
+    hash_path = data_dir / _PREFS_HASH_FILE
+    if hash_path.exists() and hash_path.read_text(encoding="utf-8").strip() == _compute_prefs_hash(prefs_file):
+        return False
+    return True
+
+
+def save_prefs_hash(data_dir: Path) -> None:
+    """Persist the hash of the current latest member_prefs file."""
+    prefs_file = _find_latest_prefs(data_dir)
+    if prefs_file is None:
+        return
+    (data_dir / _PREFS_HASH_FILE).write_text(_compute_prefs_hash(prefs_file), encoding="utf-8")
 
 
 def _to_str(value: object) -> str:

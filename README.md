@@ -71,7 +71,7 @@ src/grip/
 │   ├── slack.py             ← Slack webhook poster
 │   └── formatter.py         ← Block Kit formatting
 ├── feedback/
-│   ├── collector.py         ← logs 👍/👎 from Slack Events API
+│   ├── collector.py         ← polls 👍/👎 reactions from Slack
 │   └── updater.py           ← weekly profile update from feedback
 ├── profile/
 │   └── manager.py           ← read/write/version interest profile
