@@ -15,6 +15,7 @@ import urllib.request
 from datetime import datetime, timedelta
 from pathlib import Path
 from urllib.error import URLError
+from urllib.parse import urlencode
 
 from grip.config import Settings, get_ssl_context, load_settings
 from grip.feedback.digest_registry import DigestRegistry
@@ -179,7 +180,7 @@ class FeedbackCollector:
 
     def _api_get(self, token: str, url: str, params: dict) -> dict | None:
         """Make a Slack Web API GET request. Returns parsed JSON body or None on failure."""
-        query = "&".join(f"{k}={v}" for k, v in params.items())
+        query = urlencode(params)
         full_url = f"{url}?{query}"
         req = urllib.request.Request(
             full_url,
