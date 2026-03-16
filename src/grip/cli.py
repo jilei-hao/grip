@@ -63,7 +63,6 @@ def main() -> None:
 
 
 def _run_profile_update(dry_run: bool = False) -> None:
-    """Shared logic for --update-profile and grip-update-profile."""
     from grip.config import load_settings
     from grip.profile.synthesizer import synthesize_profile, prefs_changed, save_prefs_hash
     from grip.profile.search_refiner import refine_search_terms
@@ -91,35 +90,6 @@ def _run_profile_update(dry_run: bool = False) -> None:
 
     print("── Profile update complete ──")
 
-
-def update_profile() -> None:
-    """Secondary entry point: grip-update-profile"""
-    import argparse as _ap
-    p = _ap.ArgumentParser(prog="grip-update-profile")
-    p.add_argument("--dry-run", action="store_true", help="Preview each step without saving.")
-    args = p.parse_args()
-    try:
-        from dotenv import load_dotenv
-        load_dotenv()
-    except ImportError:
-        pass
-    _run_profile_update(dry_run=args.dry_run)
-
-
-def synthesize_profile_entry() -> None:
-    """Secondary entry point: grip-synthesize-profile"""
-    import argparse as _ap
-    p = _ap.ArgumentParser(prog="grip-synthesize-profile")
-    p.add_argument("--dry-run", action="store_true", help="Print result without saving.")
-    args = p.parse_args()
-    try:
-        from dotenv import load_dotenv
-        load_dotenv()
-    except ImportError:
-        pass
-    from grip.profile.synthesizer import synthesize_profile
-    ok = synthesize_profile(dry_run=args.dry_run)
-    sys.exit(0 if ok else 1)
 
 
 def _init_profile() -> None:

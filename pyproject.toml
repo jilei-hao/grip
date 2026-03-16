@@ -40,8 +40,6 @@ dev = [
 [project.scripts]
 # After `pip install`, these CLI commands become available:
 grip = "grip.cli:main"
-grip-update-profile = "grip.cli:update_profile"
-grip-synthesize-profile = "grip.cli:synthesize_profile_entry"
 
 [project.urls]
 Repository = "https://github.com/your-org/grip"
