@@ -101,10 +101,10 @@ You should see a compact digest header in the channel and one thread reply per
 paper. React 👍 or 👎 on any thread reply — or leave a text comment in the
 thread — to record feedback.
 
-Run the profile update to confirm feedback collection works:
+Run GRIP to confirm feedback collection works (profile update runs automatically):
 
 ```sh
-grip --update-profile
+grip --dry-run
 ```
 
 Look for `[feedback] Polled N papers, wrote M entries.` in the output.
