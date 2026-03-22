@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GRIP Manager</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 14px;
+      background: #f4f5f7;
+      color: #2d3748;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: #1a202c;
+      color: #e2e8f0;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    header h1 { font-size: 16px; font-weight: 600; letter-spacing: 0.5px; }
+    header .subtitle { font-size: 12px; color: #718096; }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background: #2d3748;
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .sidebar-header {
+      padding: 14px 16px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #718096;
+    }
+    .member-list {
+      flex: 1;
+      overflow-y: auto;
+      list-style: none;
+    }
+    .member-list li {
+      padding: 10px 16px;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: background 0.15s;
+      line-height: 1.3;
+    }
+    .member-list li:hover { background: #3a4a5c; }
+    .member-list li.active {
+      background: #2b4580;
+      border-left-color: #63b3ed;
+    }
+    .member-list li .m-name { font-weight: 500; }
+    .member-list li .m-role { font-size: 11px; color: #a0aec0; margin-top: 2px; }
+    .sidebar-footer {
+      padding: 12px 16px;
+      border-top: 1px solid #3a4a5c;
+    }
+    .btn-add-member {
+      width: 100%;
+      padding: 8px;
+      background: #2b4580;
+      color: #e2e8f0;
+      border: 1px solid #4a5568;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 13px;
+      text-align: center;
+      transition: background 0.15s;
+    }
+    .btn-add-member:hover { background: #3182ce; }
+
+    /* ── Editor panel ── */
+    .editor {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .editor-header {
+      padding: 16px 24px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .editor-header h2 { font-size: 15px; font-weight: 600; }
+    .editor-actions { display: flex; gap: 8px; align-items: center; }
+
+    .form-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 900px;
+    }
+    .form-grid .full-width { grid-column: 1 / -1; }
+
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #718096;
+      margin-bottom: 6px;
+    }
+    .field input[type="text"],
+    .field textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #cbd5e0;
+      border-radius: 5px;
+      font-size: 13px;
+      font-family: inherit;
+      background: #fff;
+      color: #2d3748;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      resize: vertical;
+    }
+    .field input[type="text"]:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: #63b3ed;
+      box-shadow: 0 0 0 3px rgba(99,179,237,0.2);
+    }
+    .field textarea { min-height: 90px; }
+
+    /* Papers list */
+    .papers-container { display: flex; flex-direction: column; gap: 6px; }
+    .paper-row { display: flex; gap: 6px; align-items: center; }
+    .paper-row input { flex: 1; }
+    .btn-remove-paper {
+      padding: 4px 9px;
+      background: #fff;
+      border: 1px solid #fc8181;
+      border-radius: 4px;
+      color: #e53e3e;
+      cursor: pointer;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .btn-remove-paper:hover { background: #fff5f5; }
+    .btn-add-paper {
+      margin-top: 6px;
+      padding: 5px 12px;
+      background: #fff;
+      border: 1px dashed #cbd5e0;
+      border-radius: 4px;
+      color: #718096;
+      cursor: pointer;
+      font-size: 12px;
+      align-self: flex-start;
+    }
+    .btn-add-paper:hover { border-color: #63b3ed; color: #3182ce; }
+
+    /* Buttons */
+    .btn {
+      padding: 8px 18px;
+      border-radius: 5px;
+      border: none;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: #3182ce; color: #fff; }
+    .btn-danger  { background: #e53e3e; color: #fff; }
+    .btn-ghost   { background: #edf2f7; color: #4a5568; }
+
+    /* Status bar */
+    .status-bar {
+      padding: 8px 24px;
+      font-size: 12px;
+      background: #f7fafc;
+      border-top: 1px solid #e2e8f0;
+      flex-shrink: 0;
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+    }
+    .status-bar.ok   { color: #276749; }
+    .status-bar.err  { color: #c53030; }
+    .status-bar.info { color: #2b6cb0; }
+
+    /* Empty state */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #a0aec0;
+      font-size: 14px;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>GRIP Manager</h1>
+  <span class="subtitle">Member Preference Profiles</span>
+</header>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">Members</div>
+    <ul class="member-list" id="memberList"></ul>
+    <div class="sidebar-footer">
+      <button class="btn-add-member" id="btnAddMember">+ Add Member</button>
+    </div>
+  </div>
+
+  <!-- Editor -->
+  <div class="editor" id="editorPanel">
+    <div class="empty-state" id="emptyState">Select a member to edit their profile.</div>
+
+    <div id="editorContent" style="display:none; flex:1; overflow:hidden; display:none; flex-direction:column;">
+      <div class="editor-header">
+        <h2 id="editorTitle">Edit Profile</h2>
+        <div class="editor-actions">
+          <button class="btn btn-danger" id="btnDelete">Delete Member</button>
+          <button class="btn btn-primary" id="btnUpdate">Update</button>
+        </div>
+      </div>
+
+      <div class="form-scroll">
+        <div class="form-grid">
+
+          <div class="field">
+            <label>Name</label>
+            <input type="text" id="fieldName" placeholder="First Last" />
+          </div>
+
+          <div class="field">
+            <label>Role</label>
+            <input type="text" id="fieldRole" placeholder="e.g. PI, PhD student, Postdoc" />
+          </div>
+
+          <div class="field full-width">
+            <label>Research Areas</label>
+            <textarea id="fieldResearchAreas" rows="5"
+              placeholder="Describe your research interests. Copy-paste from your bio or proposal."></textarea>
+          </div>
+
+          <div class="field full-width">
+            <label>Example Papers</label>
+            <div class="papers-container" id="papersContainer"></div>
+            <button type="button" class="btn-add-paper" id="btnAddPaper">+ Add paper</button>
+          </div>
+
+          <div class="field full-width">
+            <label>Adjacent Areas</label>
+            <textarea id="fieldAdjacentAreas" rows="3"
+              placeholder="Nearby topics you want included even if not your core focus."></textarea>
+          </div>
+
+          <div class="field full-width">
+            <label>Exclusions</label>
+            <textarea id="fieldExclusions" rows="2"
+              placeholder="Topics you want filtered out."></textarea>
+          </div>
+
+          <div class="field full-width">
+            <label>Notes</label>
+            <textarea id="fieldNotes" rows="2"
+              placeholder="Anything else the recommender should know."></textarea>
+          </div>
+
+        </div>
+      </div><!-- form-scroll -->
+    </div><!-- editorContent -->
+
+    <div class="status-bar" id="statusBar"></div>
+  </div><!-- editor -->
+
+</div><!-- layout -->
+
+<script>
+  // ── State ──────────────────────────────────────────────────────────────────
+  let members = [];       // full list from server
+  let currentIdx = null;  // currently selected index
+
+  // ── DOM refs ───────────────────────────────────────────────────────────────
+  const memberList     = document.getElementById('memberList');
+  const emptyState     = document.getElementById('emptyState');
+  const editorContent  = document.getElementById('editorContent');
+  const editorTitle    = document.getElementById('editorTitle');
+  const statusBar      = document.getElementById('statusBar');
+
+  const fieldName          = document.getElementById('fieldName');
+  const fieldRole          = document.getElementById('fieldRole');
+  const fieldResearchAreas = document.getElementById('fieldResearchAreas');
+  const papersContainer    = document.getElementById('papersContainer');
+  const fieldAdjacentAreas = document.getElementById('fieldAdjacentAreas');
+  const fieldExclusions    = document.getElementById('fieldExclusions');
+  const fieldNotes         = document.getElementById('fieldNotes');
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function setStatus(msg, type = 'info') {
+    statusBar.textContent = msg;
+    statusBar.className = `status-bar ${type}`;
+  }
+
+  function showEditor(show) {
+    if (show) {
+      emptyState.style.display = 'none';
+      editorContent.style.display = 'flex';
+    } else {
+      emptyState.style.display = 'flex';
+      editorContent.style.display = 'none';
+    }
+  }
+
+  // ── Paper rows ─────────────────────────────────────────────────────────────
+  function makePaperRow(value = '') {
+    const row = document.createElement('div');
+    row.className = 'paper-row';
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.value = value;
+    inp.placeholder = 'Paper title';
+    const btn = document.createElement('button');
+    btn.className = 'btn-remove-paper';
+    btn.textContent = '×';
+    btn.addEventListener('click', () => row.remove());
+    row.appendChild(inp);
+    row.appendChild(btn);
+    return row;
+  }
+
+  function getPapers() {
+    return Array.from(papersContainer.querySelectorAll('input'))
+      .map(i => i.value.trim()).filter(v => v);
+  }
+
+  // ── Render sidebar ─────────────────────────────────────────────────────────
+  function renderSidebar() {
+    memberList.innerHTML = '';
+    members.forEach((m, i) => {
+      const li = document.createElement('li');
+      li.className = i === currentIdx ? 'active' : '';
+      li.innerHTML = `<div class="m-name">${m.name || '(unnamed)'}</div>
+                      <div class="m-role">${m.role || ''}</div>`;
+      li.addEventListener('click', () => selectMember(i));
+      memberList.appendChild(li);
+    });
+  }
+
+  // ── Flush form → members[currentIdx] ──────────────────────────────────────
+  function flushForm() {
+    if (currentIdx === null) return;
+    members[currentIdx] = {
+      name:            fieldName.value.trim() || null,
+      role:            fieldRole.value.trim() || null,
+      research_areas:  fieldResearchAreas.value || null,
+      example_papers:  getPapers().length ? getPapers() : null,
+      adjacent_areas:  fieldAdjacentAreas.value || null,
+      exclusions:      fieldExclusions.value || null,
+      notes:           fieldNotes.value || null,
+    };
+    // Strip null fields
+    Object.keys(members[currentIdx]).forEach(k => {
+      if (members[currentIdx][k] === null) delete members[currentIdx][k];
+    });
+  }
+
+  // ── Populate form ← members[idx] ──────────────────────────────────────────
+  function populateForm(idx) {
+    const m = members[idx];
+    fieldName.value          = m.name            || '';
+    fieldRole.value          = m.role            || '';
+    fieldResearchAreas.value = m.research_areas  || '';
+    fieldAdjacentAreas.value = m.adjacent_areas  || '';
+    fieldExclusions.value    = m.exclusions      || '';
+    fieldNotes.value         = m.notes           || '';
+
+    papersContainer.innerHTML = '';
+    (m.example_papers || []).forEach(p => papersContainer.appendChild(makePaperRow(p)));
+
+    editorTitle.textContent = m.name || 'New Member';
+  }
+
+  // ── Select a member ────────────────────────────────────────────────────────
+  function selectMember(idx) {
+    if (currentIdx !== null) flushForm();
+    currentIdx = idx;
+    renderSidebar();
+    populateForm(idx);
+    showEditor(true);
+    setStatus(`Editing: ${members[idx].name || '(unnamed)'}`, 'info');
+  }
+
+  // ── Add member ─────────────────────────────────────────────────────────────
+  document.getElementById('btnAddMember').addEventListener('click', () => {
+    if (currentIdx !== null) flushForm();
+    members.push({ name: 'New Member', role: '' });
+    currentIdx = members.length - 1;
+    renderSidebar();
+    populateForm(currentIdx);
+    showEditor(true);
+    fieldName.focus();
+    fieldName.select();
+    setStatus('New member added — fill in the profile and click Update.', 'info');
+  });
+
+  // ── Delete member ──────────────────────────────────────────────────────────
+  document.getElementById('btnDelete').addEventListener('click', () => {
+    if (currentIdx === null) return;
+    const name = members[currentIdx].name || 'this member';
+    if (!confirm(`Delete "${name}"?`)) return;
+    members.splice(currentIdx, 1);
+    currentIdx = members.length > 0 ? Math.min(currentIdx, members.length - 1) : null;
+    renderSidebar();
+    if (currentIdx !== null) {
+      populateForm(currentIdx);
+      showEditor(true);
+    } else {
+      showEditor(false);
+    }
+    setStatus(`"${name}" removed. Click Update to save.`, 'info');
+  });
+
+  // ── Add paper ──────────────────────────────────────────────────────────────
+  document.getElementById('btnAddPaper').addEventListener('click', () => {
+    const row = makePaperRow('');
+    papersContainer.appendChild(row);
+    row.querySelector('input').focus();
+  });
+
+  // ── Update (save) ──────────────────────────────────────────────────────────
+  document.getElementById('btnUpdate').addEventListener('click', async () => {
+    if (currentIdx !== null) flushForm();
+
+    setStatus('Saving…', 'info');
+    try {
+      const res = await fetch('/api/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ members }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.description || `HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      renderSidebar();
+      if (currentIdx !== null) populateForm(currentIdx);
+      setStatus(`Saved successfully → ${data.saved_as}`, 'ok');
+    } catch (e) {
+      setStatus(`Error: ${e.message}`, 'err');
+    }
+  });
+
+  // ── Bootstrap ─────────────────────────────────────────────────────────────
+  async function init() {
+    setStatus('Loading members…', 'info');
+    try {
+      const res = await fetch('/api/members');
+      const data = await res.json();
+      members = data.members || [];
+      renderSidebar();
+      setStatus(members.length === 0
+        ? 'No members found. Click "+ Add Member" to start.'
+        : `${members.length} member(s) loaded.`, 'info');
+    } catch (e) {
+      setStatus(`Failed to load members: ${e.message}`, 'err');
+    }
+  }
+
+  init();
+</script>
+
+</body>
+</html>

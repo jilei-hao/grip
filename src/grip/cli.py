@@ -31,11 +31,23 @@ def main() -> None:
     parser.add_argument(
         "command",
         nargs="?",
-        choices=["init", "version"],
+        choices=["init", "version", "manager"],
         help=(
             "init: copy starter profile to ./interest_profile.txt | "
-            "version: print version"
+            "version: print version | "
+            "manager: start the member-profile web UI"
         ),
+    )
+    parser.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="Host for the manager web server (default: 127.0.0.1).",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=5000,
+        help="Port for the manager web server (default: 5000).",
     )
     args = parser.parse_args()
 
@@ -53,6 +65,10 @@ def main() -> None:
 
     if args.command == "init":
         _init_profile()
+        return
+
+    if args.command == "manager":
+        _run_manager(host=args.host, port=args.port)
         return
 
     _run_profile_update(dry_run=args.dry_run)
@@ -90,6 +106,15 @@ def _run_profile_update(dry_run: bool = False) -> None:
 
     print("── Profile update complete ──")
 
+
+
+def _run_manager(host: str = "127.0.0.1", port: int = 5000) -> None:
+    try:
+        from grip.manager.app import run
+    except ImportError:
+        print("[manager] Flask is required. Install it with:  pip install grip[manager]")
+        sys.exit(1)
+    run(host=host, port=port)
 
 
 def _init_profile() -> None:

@@ -24,10 +24,13 @@ dependencies = [
 # Install when you're ready to add these sources
 rss = ["feedparser>=6.0.0"]
 semantic = ["requests>=2.31.0"]
+# Web UI for editing member preference profiles
+manager = ["flask>=3.0.0"]
 # Install everything
 all = [
     "feedparser>=6.0.0",
     "requests>=2.31.0",
+    "flask>=3.0.0",
 ]
 # Dev tools
 dev = [
